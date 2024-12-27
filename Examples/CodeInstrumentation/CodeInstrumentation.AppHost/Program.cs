@@ -11,10 +11,9 @@ var database = sql.AddDatabase("database");
 
 var service = builder.AddProject<Projects.CodeInstrumentation_Service>("service")
     .WithReference(database)
-    .WaitFor(database)
-    .WithHttpsEndpoint(port: 44342, name: "api");
+    .WaitFor(database);
 
-builder.AddProject<Projects.CodeInstrumentation_Client>("client")
+var client = builder.AddProject<Projects.CodeInstrumentation_Client>("client")
     .WithReference(service)
     .WaitFor(service);
 

@@ -1,22 +1,21 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CodeInstrumentation.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-var url = builder.Configuration.GetValue<string>("services:service:api:0");
+builder.AddServiceDefaults();
+builder.Services.AddOpenTelemetry()
+    .WithTracing(b => b.AddSource(nameof(RollDiceClient)));
 
-using var httpClient = new HttpClient();
-while (true)
-{
-    try
-    {
-        var content = await httpClient.GetStringAsync(url + "/roll");
-        Console.WriteLine(content);
-    }
-    catch (HttpRequestException ex)
-    {
-        Console.WriteLine(ex.Message);
-    }
+builder.Services.AddHttpClient(Options.DefaultName, c => c.BaseAddress = new("https://service"));
+builder.Services.AddSingleton<RollDiceClient>();
 
-    Thread.Sleep(50);
-}
+var app = builder.Build();
+
+app.Start();
+
+var client = app.Services.GetRequiredService<RollDiceClient>();
+
+await client.RollDiceAsync();
