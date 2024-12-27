@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CodeInstrumentation.Client": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
