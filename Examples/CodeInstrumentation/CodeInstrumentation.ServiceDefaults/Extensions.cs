@@ -63,7 +63,7 @@ public static class Extensions
                     {
                         o.RecordException = true;
                         o.SetDbStatementForText = true;
-                    });
+            });
             });
 
         builder.AddOpenTelemetryExporters();
