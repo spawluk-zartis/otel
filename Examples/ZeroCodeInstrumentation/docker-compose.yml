@@ -26,6 +26,8 @@ services:
       # OpenTelemetry environmental variables:
       OTEL_SERVICE_NAME: "service"
       OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+    ports:
+      - 5000:5000
     depends_on:
       - sqlserver
       - otel-collector
@@ -40,7 +42,7 @@ services:
 
   # OpenTelemetry Collector
   otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.88.0
+    image: otel/opentelemetry-collector-contrib:latest
     volumes:
       - ./otel-config.yaml:/etc/otel/config.yaml
       - ./log:/log/otel
@@ -49,33 +51,37 @@ services:
       JAEGER_ENDPOINT: "jaeger:4317"
       LOKI_ENDPOINT: "http://loki:3100/loki/api/v1/push"
     ports:
-      - "8889:8889" # Prometheus metrics exporter (scrape endpoint)
-      - "13133:13133" # health_check extension
-      - "55679:55679" # ZPages extension
+      - 1888:1888 # pprof extension
+      - 8888:8888 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
     depends_on:
       - jaeger
       - prometheus
       - loki
 
   jaeger:
-    image: jaegertracing/all-in-one:1.50.0
+    image: jaegertracing/all-in-one:latest
     ports:
       - "16686:16686" # Jaeger Web UI
 
   prometheus:
-    image: prom/prometheus:v2.42.0
+    image: prom/prometheus:latest
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
 
   loki:
-    image: grafana/loki:2.7.4
+    image: grafana/loki:latest
     ports:
       - "3100:3100"
 
   grafana:
-    image: grafana/grafana:9.4.3
+    image: grafana/grafana:latest
     volumes:
       - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
     environment:

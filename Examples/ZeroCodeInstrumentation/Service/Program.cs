@@ -20,6 +20,7 @@ app.MapGet("/roll", async (ILogger<Program> logger) =>
 });
 
 app.Run();
+return;
 
 async Task ExecuteSql(string sql)
 {

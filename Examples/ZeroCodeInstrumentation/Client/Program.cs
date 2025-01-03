@@ -6,6 +6,7 @@
 
 var url = args[0];
 using var httpClient = new HttpClient();
+
 while (true)
 {
   try
